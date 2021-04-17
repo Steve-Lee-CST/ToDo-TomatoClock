@@ -24,10 +24,6 @@ namespace ToDoTomatoClock.ViewModels
             InitBinding();
         }
 
-        private void InitLocalProperty()
-        {
-        }
-
         private void InitBinding()
         {
             InitBindingWindow();
@@ -37,6 +33,7 @@ namespace ToDoTomatoClock.ViewModels
             InitBindingCloseBtn();
             InitBindingMinimizeBtn();
             InitBindingTopMostBtn();
+            InitBindingShowTaskBtn();
             InitBindingStartBtn();
             InitBindingPauseBtn();
             InitBindingResetBtn();
@@ -131,6 +128,7 @@ namespace ToDoTomatoClock.ViewModels
             CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
             MinimizeIcon = GetBitmapBaseOnTheme(AppResource.MinimizeIcon);
             TopMostIcon = GetBitmapBaseOnTheme(AppResource.UnpinIcon);
+            ShowTaskIcon = GetBitmapBaseOnTheme(AppResource.TaskList);
             StartIcon = GetBitmapBaseOnTheme(AppResource.StartIcon);
             PauseIcon = GetBitmapBaseOnTheme(AppResource.PauseIcon);
             ResetIcon = GetBitmapBaseOnTheme(AppResource.ResetIcon);
@@ -161,6 +159,14 @@ namespace ToDoTomatoClock.ViewModels
             set => SetProperty(ref topMost, value);
         }
 
+        private string title;
+
+        public string Title
+        {
+            get => title;
+            set => SetProperty(ref title, value);
+        }
+
         private void InitBindingWindow() { }
         #endregion
 
@@ -180,7 +186,7 @@ namespace ToDoTomatoClock.ViewModels
             // CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
             CloseCmd = new RelayCommand(() =>
             {
-                WeakReferenceMessenger.Default.Send(
+                WeakReferenceMessenger.Default.Send<object, MsgToken>(
                     new object(),
                     MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "CloseWindow"));
             });
@@ -252,6 +258,28 @@ namespace ToDoTomatoClock.ViewModels
                 {
                     ApplyTheme(Ioc.Default.GetService<ITomatoClockThemeService>().Next());
                 });
+        }
+        #endregion
+
+        #region Binding ShowTaskBtn
+        private ImageBrush showTaskIcon;
+        public ImageBrush ShowTaskIcon
+        {
+            get => showTaskIcon;
+            set => SetProperty(ref showTaskIcon, value);
+        }
+
+        public ICommand ShowTaskCmd { get; set; }
+
+        private void InitBindingShowTaskBtn()
+        {
+            ShowTaskIcon = GetBitmapBaseOnTheme(AppResource.TaskList);
+            ShowTaskCmd = new RelayCommand(() =>
+            {
+                WeakReferenceMessenger.Default.Send<object, MsgToken>(
+                    new object(),
+                    MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "ShowTodayToDoWindow"));
+            });
         }
         #endregion
 

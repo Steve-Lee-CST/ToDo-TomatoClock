@@ -18,10 +18,15 @@ namespace ToDoTomatoClock.Views
         public TomatoClockView()
         {
             InitializeComponent();
+            todayToDoView = new TodayToDoView();
+            todayToDoView.Hide();
+
             InitNotifyIcon();
             RegisteMsg();
             this.Loaded += MiniWindow_Loaded;
         }
+
+        private TodayToDoView todayToDoView;
 
         private void MiniWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -41,13 +46,24 @@ namespace ToDoTomatoClock.Views
                 this,
                 MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "CloseWindow"),
                 (r, m) => {
+                    todayToDoView.Close();
                     this.Close();
+                });
+
+            WeakReferenceMessenger.Default.Register<object, MsgToken>(
+                this,
+                MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "ShowTodayToDoWindow"),
+                (r, m) => {
+                    todayToDoView.Show();
                 });
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            this.DragMove();
+            if (e.LeftButton == MouseButtonState.Pressed && e.RightButton == MouseButtonState.Released)
+            {
+                this.DragMove();
+            }
         }
 
         #region disappear from Alt + Tab

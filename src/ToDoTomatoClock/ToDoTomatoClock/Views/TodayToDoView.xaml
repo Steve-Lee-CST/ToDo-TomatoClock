@@ -5,8 +5,74 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ToDoTomatoClock.Views"
         mc:Ignorable="d"
-        Title="TodayToDoView" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Height="400" Width="320" 
+        WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen" Title="TodayToDoWindow" 
+        MouseDown="Window_MouseDown"
+        Background="{Binding GlobalBackground}" Topmost="{Binding TopMost}">
+    <Window.DataContext>
+        <vm:TodayToDoViewModel xmlns:vm="clr-namespace:ToDoTomatoClock.ViewModels" x:Name="VM"/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="FuncBarButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{Binding ButtonStaticForeground}"/>
+            <Setter Property="Foreground" Value="{Binding ButtonStaticForeground}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Opacity" Value="{Binding ButtonStaticOpacity}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{Binding ButtonStaticForeground}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <!--<Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>-->
+                                <Setter Property="BorderBrush" TargetName="border" Value="{Binding ButtonMouseOverForeground}"/>
+                                <Setter Property="Opacity" Value="{Binding ButtonMouseOverOpacity}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <!--<Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>-->
+                                <Setter Property="BorderBrush" TargetName="border" Value="{Binding ButtonPressedForeground}"/>
+                                <Setter Property="Opacity" Value="{Binding ButtonPressedOpacity}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <StackPanel>
+        <StackPanel Height="25"
+                    Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="25"
+                    x:Name="TopMostBtn"
+                    Background="{Binding TopMostIcon}"
+                    Command="{Binding TopMostCmd}"
+                    Style="{StaticResource FuncBarButtonStyle}"/>
+            <Button Width="25"
+                    x:Name="CloseBtn"
+                    Background="{Binding CloseIcon}"
+                    Command="{Binding CloseCmd}"
+                    Style="{StaticResource FuncBarButtonStyle}"/>
+        </StackPanel>
+    </StackPanel>
 </Window>

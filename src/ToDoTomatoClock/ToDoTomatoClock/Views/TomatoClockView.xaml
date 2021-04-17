@@ -97,24 +97,31 @@
         </Style>
     </Window.Resources>
     <StackPanel>
-        <StackPanel Height="25" 
+        <StackPanel Height="25"
                     Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Height="25" Width="25"
+            <TextBlock Width="210" 
+                       x:Name="TitleTB"
+                       FontFamily="Consolas" FontSize="20"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       TextAlignment="Center" 
+                       Text="{Binding Title}"/>
+            <Grid Width="10"/>
+            <Button Width="25"
                     x:Name="ChangeThemeBtn"
                     Content="{Binding ThemeTag}"
                     Command="{Binding ChangeThemeCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
-            <Button Height="25" Width="25"
+            <Button Width="25"
                     x:Name="TopMostBtn"
                     Background="{Binding TopMostIcon}"
                     Command="{Binding TopMostCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
-            <Button Height="25" Width="25"
+            <Button Width="25"
                     x:Name="MinimizeBtn"
                     Background="{Binding MinimizeIcon}"
                     Command="{Binding MinimizeCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
-            <Button Height="25" Width="25"
+            <Button Width="25"
                     x:Name="CloseBtn"
                     Background="{Binding CloseIcon}"
                     Command="{Binding CloseCmd}"
@@ -130,6 +137,11 @@
         </Label>
         <StackPanel Height="30" 
                     Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Height="30" Width="30"
+                    x:Name="ShowTaskBtn"
+                    Background="{Binding ShowTaskIcon}"
+                    Command="{Binding ShowTaskCmd}"
+                    Style="{StaticResource FuncBarButtonStyle}"/>
             <Button Height="30" Width="30"
                     x:Name="StartBtn"
                     Background="{Binding StartIcon}"

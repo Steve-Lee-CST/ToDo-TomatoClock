@@ -47,12 +47,11 @@ namespace MSToDoDB
         protected void CheckTodayTasksChangeWithoutLock()
         {
             string nowDate = DateTime.Now.ToString("yyyy-MM-dd");
-            List<Task> nowTodayTasks =
-                context.Tasks
-                .Where(x => x.CommittedDate == nowDate)
-                .OrderBy(x => x.CommittedOrder)
-                .Reverse()
-                .ToList();
+            List<Task> tempTask = context.Tasks.ToList();
+            List<Task> completedTask = tempTask.Where(x => x.Status == "Completed").OrderBy(x => x.CommittedOrder).Reverse().ToList();
+            List<Task> notStartedTask = tempTask.Where(x => x.Status == "NotStarted").OrderBy(x => x.CommittedOrder).Reverse().ToList();
+            List<Task> nowTodayTasks = new List<Task>(notStartedTask);
+            nowTodayTasks.AddRange(completedTask);
             if (nowTodayTasks.Count != preTodayTasks.Count)
             {
                 OnTodayTaskUpdated?.Invoke(nowTodayTasks);
@@ -63,6 +62,7 @@ namespace MSToDoDB
             {
                 if (preTodayTasks[i].CommittedOrder != nowTodayTasks[i].CommittedOrder ||
                     preTodayTasks[i].Subject != nowTodayTasks[i].Subject ||
+                    preTodayTasks[i].Status != nowTodayTasks[i].Status ||
                     preTodayTasks[i].OriginalBodyContent != nowTodayTasks[i].OriginalBodyContent)
                 {
                     OnTodayTaskUpdated?.Invoke(nowTodayTasks);
