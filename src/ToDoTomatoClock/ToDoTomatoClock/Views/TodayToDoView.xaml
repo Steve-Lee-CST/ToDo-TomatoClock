@@ -74,5 +74,8 @@
                     Command="{Binding CloseCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
         </StackPanel>
+        <ListBox Height="375" 
+                 x:Name="TodayTaskLB"
+                 ItemsSource="{Binding TodayTasks}"/>
     </StackPanel>
 </Window>

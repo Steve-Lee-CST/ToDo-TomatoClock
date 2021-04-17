@@ -4,6 +4,7 @@ using System.Windows.Threading;
 using ToDoTomatoClock.Config;
 using ToDoTomatoClock.Models;
 using System.Linq;
+using System.Threading;
 
 namespace ToDoTomatoClock.Services.Countdown
 {

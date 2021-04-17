@@ -10,6 +10,7 @@ using System.Windows;
 using ToDoTomatoClock.Config;
 using ToDoTomatoClock.Services.Countdown;
 using ToDoTomatoClock.Services.ThemeController;
+using ToDoTomatoClock.Services.ToDoDBMonitor;
 
 namespace ToDoTomatoClock
 {
@@ -34,6 +35,7 @@ namespace ToDoTomatoClock
                 new ServiceCollection()
                 .AddSingleton<ICountdownService, CountdownService>()
                 .AddSingleton<ITomatoClockThemeService, TomatoClockThemeService>()
+                .AddSingleton<ITodayTaskMonitorService, TodayTaskMonitorService>()
                 .BuildServiceProvider());
         }
     }

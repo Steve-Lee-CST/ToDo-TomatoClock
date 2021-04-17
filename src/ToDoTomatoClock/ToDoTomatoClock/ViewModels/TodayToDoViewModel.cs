@@ -2,15 +2,15 @@
 using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
-using System;
+using MSToDoDB.Modules;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
 using ToDoTomatoClock.Config;
 using ToDoTomatoClock.Models;
 using ToDoTomatoClock.Services.ThemeController;
+using ToDoTomatoClock.Services.ToDoDBMonitor;
 using ToDoTomatoClock.Tools;
 using ToDoTomatoClock.Views;
 
@@ -30,6 +30,7 @@ namespace ToDoTomatoClock.ViewModels
 
             InitBindingCloseBtn();
             InitBindingTopMostBtn();
+            InitBindingTodayTaskLB();
         }
 
         #region Binding TomatoClockTheme
@@ -170,7 +171,7 @@ namespace ToDoTomatoClock.ViewModels
             // CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
             CloseCmd = new RelayCommand(() =>
             {
-                WeakReferenceMessenger.Default.Send<object, MsgToken>(
+                StrongReferenceMessenger.Default.Send<object, MsgToken>(
                     new object(),
                     MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "HideWindow"));
             });
@@ -197,6 +198,24 @@ namespace ToDoTomatoClock.ViewModels
                 TopMost = !TopMost;
                 TopMostIcon = TopMost ? GetBitmapBaseOnTheme(AppResource.PinIcon) : GetBitmapBaseOnTheme(AppResource.UnpinIcon);
             });
+        }
+        #endregion
+
+        #region Binding TodayTaskLB
+        private List<Task> todayTasks;
+
+        public List<Task> TodayTasks
+        {
+            get => todayTasks;
+            set => SetProperty(ref todayTasks, value);
+        }
+
+        private void InitBindingTodayTaskLB()
+        {
+            Ioc.Default.GetService<ITodayTaskMonitorService>().DataChangeEvent += (d) =>
+            {
+                TodayTasks = d;
+            };
         }
         #endregion
 
