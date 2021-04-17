@@ -126,7 +126,7 @@
                Foreground="{Binding LabelForeground}"
                FontFamily="{Binding LabelFontFamily}"
                FontSize="{Binding LabelFontSize}"
-               Content="{Binding Countdown}">
+               Content="{Binding CountdownStr}">
         </Label>
         <StackPanel Height="30" 
                     Orientation="Horizontal" HorizontalAlignment="Center">

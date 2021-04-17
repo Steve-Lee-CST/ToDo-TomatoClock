@@ -17,7 +17,9 @@ namespace ToDoTomatoClock.Services.Countdown
             if (-1 == infoPtr) return;
             if(0 == currentInfo.TotalSecond)
             {
-                ((ICountdownService)this).Next();
+                infoPtr = (infoPtr + 1) % countdownInfos.Count;
+                CurrentInfo = countdownInfos[infoPtr];
+                TickEvent?.Invoke(CurrentInfo);
             }
 
             if(DateTime.MinValue == currentInfo.StartTime)
@@ -92,13 +94,13 @@ namespace ToDoTomatoClock.Services.Countdown
                 currentInfo.Tick();
                 if (currentInfo.ReachEnd)
                 {
-                    TickEvent?.Invoke(currentInfo.Copy());
+                    Stop();
+                    TickEvent?.Invoke(CurrentInfo);
+                    ReachEndEvent?.Invoke(CurrentInfo);
                 }
                 else
                 {
-                    Stop();
-                    TickEvent?.Invoke(currentInfo.Copy());
-                    ReachEndEvent?.Invoke(CurrentInfo);
+                    TickEvent?.Invoke(CurrentInfo);
                 }
             };
         }

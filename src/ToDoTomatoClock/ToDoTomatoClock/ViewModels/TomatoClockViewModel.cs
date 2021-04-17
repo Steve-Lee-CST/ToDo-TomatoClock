@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
 using ToDoTomatoClock.Config;
+using ToDoTomatoClock.Models;
 using ToDoTomatoClock.Services.Countdown;
 using ToDoTomatoClock.Services.ThemeController;
 using ToDoTomatoClock.Tools;
@@ -40,6 +41,7 @@ namespace ToDoTomatoClock.ViewModels
             InitBindingPauseBtn();
             InitBindingResetBtn();
             InitBindingNextBtn();
+            InitBindingCountdownStr();
         }
 
         #region Binding TomatoClockTheme
@@ -285,15 +287,16 @@ namespace ToDoTomatoClock.ViewModels
             set => SetProperty(ref pauseIcon, value);
         }
 
-        public ICommand PauseCmd;
+        public ICommand PauseCmd { get; set; }
 
         private void InitBindingPauseBtn()
         {
             // PauseIcon = GetBitmapBaseOnTheme(AppResource.PauseIcon);
-            PauseCmd = new RelayCommand(() =>
-            {
-                Ioc.Default.GetService<ICountdownService>().Pause();
-            });
+            PauseCmd = new RelayCommand(
+                () =>
+                {
+                    Ioc.Default.GetService<ICountdownService>().Pause();
+                });
         }
         #endregion
 
@@ -339,6 +342,28 @@ namespace ToDoTomatoClock.ViewModels
         }
         #endregion
 
+        #region Binding CountdownStr
+        private string countdonwStr;
+
+        public string CountdownStr
+        {
+            get => countdonwStr;
+            set => SetProperty(ref countdonwStr, value);
+        }
+
+        private void InitBindingCountdownStr()
+        {
+            CountdownStr = CountdownInfoToStr(Ioc.Default.GetService<ICountdownService>().CurrentInfo);
+            Ioc.Default.GetService<ICountdownService>().TickEvent += (t) =>
+            {
+                CountdownStr = CountdownInfoToStr(t);
+            };
+            Ioc.Default.GetService<ICountdownService>().ReachEndEvent += (t) =>
+            {
+                Utils.PlaySound(App.UConfig.AlarmFile);
+            };
+        }
+        #endregion
 
         #region Function
         private ImageBrush GetBitmapBaseOnTheme(Bitmap bitmap) => 
@@ -349,6 +374,13 @@ namespace ToDoTomatoClock.ViewModels
                         ButtonStaticForeground.Color.R,
                         ButtonStaticForeground.Color.G,
                         ButtonStaticForeground.Color.B)));
+
+        private string CountdownInfoToStr(CountdownInfo info)
+        {
+            return $"" +
+                    $"{info.Minute.ToString().PadLeft(2, '0')}:" +
+                    $"{info.Second.ToString().PadLeft(2, '0')}";
+        }
 
         #endregion
     }
