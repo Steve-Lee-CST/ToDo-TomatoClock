@@ -36,7 +36,7 @@ namespace ToDoTomatoClock.Views
 
         private void RegisteMsg()
         {
-            StrongReferenceMessenger.Default.Register<object, MsgToken>(
+            StrongReferenceMessenger.Default.Register<object, string>(
                 this,
                 MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "HideWindow"),
                 (r, m) => {

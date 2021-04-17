@@ -171,7 +171,7 @@ namespace ToDoTomatoClock.ViewModels
             // CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
             CloseCmd = new RelayCommand(() =>
             {
-                StrongReferenceMessenger.Default.Send<object, MsgToken>(
+                StrongReferenceMessenger.Default.Send<object, string>(
                     new object(),
                     MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "HideWindow"));
             });
