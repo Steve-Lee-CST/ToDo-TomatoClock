@@ -26,11 +26,29 @@ namespace ToDoTomatoClock.ViewModels
         private void InitBinding()
         {
             InitBindingWindow();
-            ApplyTheme(Ioc.Default.GetService<ITomatoClockThemeService>().CurrentTheme);
 
             InitBindingCloseBtn();
             InitBindingTopMostBtn();
             InitBindingTodayTaskLB();
+
+            WeakReferenceMessenger.Default.Register<object, string>(
+                this,
+                MsgToken.Create(nameof(TomatoClockViewModel), nameof(TodayToDoViewModel), "ShowTodayToDoWindow"),
+                (r, m) =>
+                {
+                    ApplyTheme(Ioc.Default.GetService<ITomatoClockThemeService>().CurrentTheme);
+                    WeakReferenceMessenger.Default.Send(
+                        new object(),
+                        MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "ShowWindow"));
+                });
+            WeakReferenceMessenger.Default.Register<object, string>(
+                this,
+                MsgToken.Global("Close"),
+                (r, m) => {
+                    WeakReferenceMessenger.Default.Send(
+                        new object(),
+                        MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "CloseWindow"));
+                });
         }
 
         #region Binding TomatoClockTheme
@@ -171,7 +189,7 @@ namespace ToDoTomatoClock.ViewModels
             // CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
             CloseCmd = new RelayCommand(() =>
             {
-                StrongReferenceMessenger.Default.Send<object, string>(
+                WeakReferenceMessenger.Default.Send<object, string>(
                     new object(),
                     MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "HideWindow"));
             });
@@ -210,8 +228,27 @@ namespace ToDoTomatoClock.ViewModels
             set => SetProperty(ref todayTasks, value);
         }
 
+        private Task selectedTask;
+
+        public Task SelectedTask
+        {
+            get => selectedTask;
+            set
+            {
+                SetProperty(ref selectedTask, value);
+            }
+        }
+
+        public ICommand TodayTaskLBItemDBClickCmd { get; set; }
+
         private void InitBindingTodayTaskLB()
         {
+            TodayTaskLBItemDBClickCmd = new RelayCommand<object>((_) =>
+            {
+                WeakReferenceMessenger.Default.Send(
+                    SelectedTask,
+                    MsgToken.Create(nameof(TodayToDoViewModel), nameof(TomatoClockViewModel), "selectedTask"));
+            });
             Ioc.Default.GetService<ITodayTaskMonitorService>().DataChangeEvent += (d) =>
             {
                 TodayTasks = d;

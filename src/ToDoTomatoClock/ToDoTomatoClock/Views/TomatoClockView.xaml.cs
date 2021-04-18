@@ -18,15 +18,12 @@ namespace ToDoTomatoClock.Views
         public TomatoClockView()
         {
             InitializeComponent();
-            todayToDoView = new TodayToDoView();
-            todayToDoView.Hide();
 
             InitNotifyIcon();
             RegisteMsg();
             this.Loaded += MiniWindow_Loaded;
         }
 
-        private TodayToDoView todayToDoView;
 
         private void MiniWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -35,27 +32,18 @@ namespace ToDoTomatoClock.Views
 
         private void RegisteMsg()
         {
-            StrongReferenceMessenger.Default.Register<object, string>(
+            WeakReferenceMessenger.Default.Register<object, string>(
                 this,
                 MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "MinimizeWindow"),
                 (r, m) => {
                     this.Hide();
                 });
 
-            StrongReferenceMessenger.Default.Register<object, string>(
+            WeakReferenceMessenger.Default.Register<object, string>(
                 this,
                 MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "CloseWindow"),
                 (r, m) => {
-                    todayToDoView.Close();
                     this.Close();
-                });
-
-            StrongReferenceMessenger.Default.Register<object, string>(
-                this,
-                MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "ShowTodayToDoWindow"),
-                (r, m) =>
-                {
-                    todayToDoView.Show();
                 });
         }
 

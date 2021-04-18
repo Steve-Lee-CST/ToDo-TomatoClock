@@ -2,6 +2,7 @@
 using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
+using MSToDoDB.Modules;
 using System.Drawing;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -36,6 +37,8 @@ namespace ToDoTomatoClock.ViewModels
             InitBindingResetBtn();
             InitBindingNextBtn();
             InitBindingCountdownStr();
+
+            
         }
 
         #region Binding TomatoClockTheme
@@ -164,7 +167,26 @@ namespace ToDoTomatoClock.ViewModels
             set => SetProperty(ref title, value);
         }
 
-        private void InitBindingWindow() { }
+        private Task selectedTask;
+
+        public Task SelectedTask
+        {
+            get => selectedTask;
+            set => SetProperty(ref selectedTask, value);
+        }
+
+
+        private void InitBindingWindow() 
+        {
+            WeakReferenceMessenger.Default.Register<Task, string>(
+                this,
+                MsgToken.Create(nameof(TodayToDoViewModel), nameof(TomatoClockViewModel), "selectedTask"),
+                (r, m) =>
+                {
+                    SelectedTask = m;
+                    Title = m.Subject;
+                });
+        }
         #endregion
 
         #region Binding CloseBtn
@@ -183,7 +205,10 @@ namespace ToDoTomatoClock.ViewModels
             // CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
             CloseCmd = new RelayCommand(() =>
             {
-                StrongReferenceMessenger.Default.Send(
+                WeakReferenceMessenger.Default.Send(
+                    new object(),
+                    MsgToken.Global("Close"));
+                WeakReferenceMessenger.Default.Send(
                     new object(),
                     MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "CloseWindow"));
             });
@@ -206,7 +231,7 @@ namespace ToDoTomatoClock.ViewModels
             // MinimizeIcon = GetBitmapBaseOnTheme(AppResource.MinimizeIcon);
             MinimizeCmd = new RelayCommand(() =>
             {
-                StrongReferenceMessenger.Default.Send(
+                WeakReferenceMessenger.Default.Send(
                     new object(),
                     MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "MinimizeWindow"));
             });
@@ -273,9 +298,9 @@ namespace ToDoTomatoClock.ViewModels
             ShowTaskIcon = GetBitmapBaseOnTheme(AppResource.TaskList);
             ShowTaskCmd = new RelayCommand(() =>
             {
-                StrongReferenceMessenger.Default.Send(
+                WeakReferenceMessenger.Default.Send(
                     new object(),
-                    MsgToken.Create(nameof(TomatoClockViewModel), nameof(TomatoClockView), "ShowTodayToDoWindow"));
+                    MsgToken.Create(nameof(TomatoClockViewModel), nameof(TodayToDoViewModel), "ShowTodayToDoWindow"));
             });
         }
         #endregion

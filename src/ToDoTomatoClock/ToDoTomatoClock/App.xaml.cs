@@ -11,6 +11,7 @@ using ToDoTomatoClock.Config;
 using ToDoTomatoClock.Services.Countdown;
 using ToDoTomatoClock.Services.ThemeController;
 using ToDoTomatoClock.Services.ToDoDBMonitor;
+using ToDoTomatoClock.Views;
 
 namespace ToDoTomatoClock
 {
@@ -36,7 +37,12 @@ namespace ToDoTomatoClock
                 .AddSingleton<ICountdownService, CountdownService>()
                 .AddSingleton<ITomatoClockThemeService, TomatoClockThemeService>()
                 .AddSingleton<ITodayTaskMonitorService, TodayTaskMonitorService>()
+                .AddSingleton<TodayToDoView>()
                 .BuildServiceProvider());
+
+            Ioc.Default.GetService<TodayToDoView>();
         }
+
+       
     }
 }

@@ -36,11 +36,23 @@ namespace ToDoTomatoClock.Views
 
         private void RegisteMsg()
         {
-            StrongReferenceMessenger.Default.Register<object, string>(
+            WeakReferenceMessenger.Default.Register<object, string>(
                 this,
                 MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "HideWindow"),
                 (r, m) => {
                     this.Hide();
+                });
+            WeakReferenceMessenger.Default.Register<object, string>(
+                this,
+                MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "ShowWindow"),
+                (r, m) => {
+                    this.Show();
+                });
+            WeakReferenceMessenger.Default.Register<object, string>(
+                this,
+                MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "CloseWindow"),
+                (r, m) => {
+                    this.Close();
                 });
         }
 
