@@ -138,8 +138,12 @@ namespace ToDoTomatoClock.ViewModels
             TopMostIcon = GetBitmapBaseOnTheme(AppResource.UnpinIcon);
             LabelFontFamily = new System.Windows.Media.FontFamily(theme.Label.FontFamily);
             LabelFontSize = theme.Label.FontSize;
-            LabelForeground = new SolidColorBrush(ColorStrToColor(theme.Label.Foreground));
+            LabelForeground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(
+                ColorStrToColor(theme.Label.Foreground).R,
+                ColorStrToColor(theme.Label.Foreground).G,
+                ColorStrToColor(theme.Label.Foreground).B));
         }
+        
 
         private System.Windows.Media.Color ColorStrToColor(string colorStr) =>
             (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorStr);
@@ -240,6 +244,7 @@ namespace ToDoTomatoClock.ViewModels
         }
 
         public ICommand TodayTaskLBItemDBClickCmd { get; set; }
+        public ICommand TodayTaskLBItemLostFocus { get; set; }
 
         private void InitBindingTodayTaskLB()
         {
@@ -248,7 +253,14 @@ namespace ToDoTomatoClock.ViewModels
                 WeakReferenceMessenger.Default.Send(
                     SelectedTask,
                     MsgToken.Create(nameof(TodayToDoViewModel), nameof(TomatoClockViewModel), "selectedTask"));
+                SelectedTask = null;
             });
+
+            TodayTaskLBItemLostFocus = new RelayCommand(() =>
+            {
+                SelectedTask = null;
+            });
+
             Ioc.Default.GetService<ITodayTaskMonitorService>().DataChangeEvent += (d) =>
             {
                 TodayTasks = d;

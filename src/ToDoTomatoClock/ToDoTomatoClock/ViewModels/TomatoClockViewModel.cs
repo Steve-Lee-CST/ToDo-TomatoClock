@@ -31,17 +31,52 @@ namespace ToDoTomatoClock.ViewModels
             InitBindingCloseBtn();
             InitBindingMinimizeBtn();
             InitBindingTopMostBtn();
-            InitBindingShowTaskBtn();
+            
             InitBindingStartBtn();
             InitBindingPauseBtn();
             InitBindingResetBtn();
             InitBindingNextBtn();
+            InitBindingPreBtn();
+            InitBindingFCListBtn();
+            InitBindingTaskListBtn();
+
             InitBindingCountdownStr();
 
             
         }
 
         #region Binding TomatoClockTheme
+
+        // 更改主题
+        private void ApplyTheme(TomatoClockTheme theme)
+        {
+            ThemeTag = theme.Tag;
+            GlobalBackground = new SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(theme.GlobalBackground));
+            ButtonStaticForeground = new SolidColorBrush(ColorStrToColor(theme.Button.StaticForeground));
+            ButtonMouseOverForeground = new SolidColorBrush(ColorStrToColor(theme.Button.MouseOverForeground));
+            ButtonPressedForeground = new SolidColorBrush(ColorStrToColor(theme.Button.PressedForeground));
+            ButtonStaticOpacity = ColorStrToColor(theme.Button.StaticForeground).A / 255.0;
+            ButtonMouseOverOpacity = ColorStrToColor(theme.Button.MouseOverForeground).A / 255.0;
+            ButtonPressedOpacity = ColorStrToColor(theme.Button.PressedForeground).A / 255.0;
+
+            CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
+            MinimizeIcon = GetBitmapBaseOnTheme(AppResource.MinimizeIcon);
+            TopMostIcon = GetBitmapBaseOnTheme(AppResource.UnpinIcon);
+
+            StartIcon = GetBitmapBaseOnTheme(AppResource.StartIcon);
+            PauseIcon = GetBitmapBaseOnTheme(AppResource.PauseIcon);
+            ResetIcon = GetBitmapBaseOnTheme(AppResource.ResetIcon);
+            NextIcon = GetBitmapBaseOnTheme(AppResource.NextIcon);
+            PreIcon = GetBitmapBaseOnTheme(AppResource.PreIcon);
+            FCListIcon = GetBitmapBaseOnTheme(AppResource.FCListIcon);
+            TaskListIcon = GetBitmapBaseOnTheme(AppResource.TaskListIcon);
+
+            LabelFontFamily = new System.Windows.Media.FontFamily(theme.Label.FontFamily);
+            LabelFontSize = theme.Label.FontSize;
+            LabelForeground = new SolidColorBrush(ColorStrToColor(theme.Label.Foreground));
+        }
+
         private SolidColorBrush buttonStaticForeground;
 
         public SolidColorBrush ButtonStaticForeground
@@ -111,31 +146,6 @@ namespace ToDoTomatoClock.ViewModels
         {
             get => labelForeground;
             set => SetProperty(ref labelForeground, value);
-        }
-
-        // 更改主题
-        private void ApplyTheme(TomatoClockTheme theme)
-        {
-            ThemeTag = theme.Tag;
-            GlobalBackground = new SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(theme.GlobalBackground));
-            ButtonStaticForeground = new SolidColorBrush(ColorStrToColor(theme.Button.StaticForeground));
-            ButtonMouseOverForeground = new SolidColorBrush(ColorStrToColor(theme.Button.MouseOverForeground));
-            ButtonPressedForeground = new SolidColorBrush(ColorStrToColor(theme.Button.PressedForeground));
-            ButtonStaticOpacity = ColorStrToColor(theme.Button.StaticForeground).A / 255.0;
-            ButtonMouseOverOpacity = ColorStrToColor(theme.Button.MouseOverForeground).A / 255.0;
-            ButtonPressedOpacity = ColorStrToColor(theme.Button.PressedForeground).A / 255.0;
-            CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
-            MinimizeIcon = GetBitmapBaseOnTheme(AppResource.MinimizeIcon);
-            TopMostIcon = GetBitmapBaseOnTheme(AppResource.UnpinIcon);
-            ShowTaskIcon = GetBitmapBaseOnTheme(AppResource.TaskList);
-            StartIcon = GetBitmapBaseOnTheme(AppResource.StartIcon);
-            PauseIcon = GetBitmapBaseOnTheme(AppResource.PauseIcon);
-            ResetIcon = GetBitmapBaseOnTheme(AppResource.ResetIcon);
-            NextIcon = GetBitmapBaseOnTheme(AppResource.NextIcon);
-            LabelFontFamily = new System.Windows.Media.FontFamily(theme.Label.FontFamily);
-            LabelFontSize = theme.Label.FontSize;
-            LabelForeground = new SolidColorBrush(ColorStrToColor(theme.Label.Foreground));
         }
 
         private System.Windows.Media.Color ColorStrToColor(string colorStr) =>
@@ -283,28 +293,6 @@ namespace ToDoTomatoClock.ViewModels
         }
         #endregion
 
-        #region Binding ShowTaskBtn
-        private ImageBrush showTaskIcon;
-        public ImageBrush ShowTaskIcon
-        {
-            get => showTaskIcon;
-            set => SetProperty(ref showTaskIcon, value);
-        }
-
-        public ICommand ShowTaskCmd { get; set; }
-
-        private void InitBindingShowTaskBtn()
-        {
-            ShowTaskIcon = GetBitmapBaseOnTheme(AppResource.TaskList);
-            ShowTaskCmd = new RelayCommand(() =>
-            {
-                WeakReferenceMessenger.Default.Send(
-                    new object(),
-                    MsgToken.Create(nameof(TomatoClockViewModel), nameof(TodayToDoViewModel), "ShowTodayToDoWindow"));
-            });
-        }
-        #endregion
-
         #region Binding StartBtn
         // 开始图标
         private ImageBrush startIcon;
@@ -371,6 +359,26 @@ namespace ToDoTomatoClock.ViewModels
         }
         #endregion
 
+        #region Binding PreBtn
+        public ImageBrush preIcon;
+        public ImageBrush PreIcon
+        {
+            get => preIcon;
+            set => SetProperty(ref preIcon, value);
+        }
+
+        public ICommand PreCmd { get; set; }
+
+        private void InitBindingPreBtn()
+        {
+            // PreIcon = GetBitmapBaseOnTheme(AppResource.PreIcon);
+            PreCmd = new RelayCommand(() =>
+            {
+                Ioc.Default.GetService<ICountdownService>().Pre();
+            });
+        }
+        #endregion
+
         #region Binding NextBtn
         // 下一个图标
         public ImageBrush nextIcon;
@@ -388,6 +396,51 @@ namespace ToDoTomatoClock.ViewModels
             NextCmd = new RelayCommand(() =>
             {
                 Ioc.Default.GetService<ICountdownService>().Next();
+            });
+        }
+        #endregion
+
+        #region Binding FCListBtn
+        private ImageBrush fcListIcon;
+
+        public ImageBrush FCListIcon
+        {
+            get => fcListIcon;
+            set => SetProperty(ref fcListIcon, value);
+        }
+
+        public ICommand FCListCmd { get; set; }
+
+        private void InitBindingFCListBtn()
+        {
+            FCListIcon = GetBitmapBaseOnTheme(AppResource.FCListIcon);
+
+            FCListCmd = new RelayCommand(() =>
+            {
+
+            });
+        }
+
+        #endregion
+
+        #region Binding TaskListBtn
+        private ImageBrush taskListIcon;
+        public ImageBrush TaskListIcon
+        {
+            get => taskListIcon;
+            set => SetProperty(ref taskListIcon, value);
+        }
+
+        public ICommand TaskListCmd { get; set; }
+
+        private void InitBindingTaskListBtn()
+        {
+            // TaskListIcon = GetBitmapBaseOnTheme(AppResource.TaskListIcon);
+            TaskListCmd = new RelayCommand(() =>
+            {
+                WeakReferenceMessenger.Default.Send(
+                    new object(),
+                    MsgToken.Create(nameof(TomatoClockViewModel), nameof(TodayToDoViewModel), "ShowTodayToDoWindow"));
             });
         }
         #endregion

@@ -99,15 +99,16 @@
     <StackPanel>
         <StackPanel Height="25"
                     Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Width="210" 
+            <TextBlock Width="200" Margin="10,0,0,0"
                        x:Name="TitleTB"
-                       TextAlignment="Center" FontSize="18"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       TextAlignment="Left" FontSize="18"
+                       HorizontalAlignment="Left" VerticalAlignment="Center"
                        Foreground="{Binding LabelForeground}"
                        Text="{Binding Title}"/>
             <Grid Width="10"/>
             <Button Width="25"
                     x:Name="ChangeThemeBtn"
+                    FontWeight="Bold" FontSize="18"
                     Content="{Binding ThemeTag}"
                     Command="{Binding ChangeThemeCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
@@ -137,33 +138,40 @@
         </Label>
         <StackPanel Height="30" 
                     Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Height="30" Width="30"
-                    x:Name="ShowTaskBtn"
-                    Background="{Binding ShowTaskIcon}"
-                    Command="{Binding ShowTaskCmd}"
-                    Style="{StaticResource FuncBarButtonStyle}"/>
-            <Button Height="30" Width="30"
+            <Button Height="30" Width="30" Margin="5,0,5,0"
                     x:Name="StartBtn"
                     Background="{Binding StartIcon}"
                     Command="{Binding StartCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
-            <Grid Width="10"/>
-            <Button Height="30" Width="30"
+            <Button Height="30" Width="30" Margin="5,0,5,0"
                     x:Name="PauseBtn" 
                     Background="{Binding PauseIcon}"
                     Command="{Binding PauseCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
-            <Grid Width="10"/>
-            <Button Height="30" Width="30"
+            <Button Height="30" Width="30" Margin="5,0,5,0"
                     x:Name="ResetBtn" 
                     Background="{Binding ResetIcon}"
                     Command="{Binding ResetCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
-            <Grid Width="10"/>
-            <Button Height="30" Width="30"
-                    x:Name="FinishBtn"
+            <Button Height="30" Width="30" Margin="5,0,5,0"
+                    x:Name="PreBtn"
+                    Background="{Binding PreIcon}"
+                    Command="{Binding PreCmd}"
+                    Style="{StaticResource FuncBarButtonStyle}"/>
+            <Button Height="30" Width="30" Margin="5,0,5,0"
+                    x:Name="NextBtn"
                     Background="{Binding NextIcon}"
                     Command="{Binding NextCmd}"
+                    Style="{StaticResource FuncBarButtonStyle}"/>
+            <Button Height="30" Width="30" Margin="5,0,5,0"
+                    x:Name="FCListBtn"
+                    Background="{Binding FCListIcon}"
+                    Command="{Binding FCListCmd}"
+                    Style="{StaticResource FuncBarButtonStyle}"/>
+            <Button Height="30" Width="30" Margin="5,0,5,0"
+                    x:Name="TaskListBtn"
+                    Background="{Binding TaskListIcon}"
+                    Command="{Binding TaskListCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
         </StackPanel>
     </StackPanel>

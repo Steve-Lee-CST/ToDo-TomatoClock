@@ -21,11 +21,17 @@ namespace ToDoTomatoClock.Views
 
             InitNotifyIcon();
             RegisteMsg();
-            this.Loaded += MiniWindow_Loaded;
+            this.Loaded += TomatoClockView_Loaded;
+            this.Closed += TomatoClockView_Closed;
         }
 
+        private void TomatoClockView_Closed(object sender, EventArgs e)
+        {
+            notifyIcon.Visible = false;
+            notifyIcon.Dispose();
+        }
 
-        private void MiniWindow_Loaded(object sender, RoutedEventArgs e)
+        private void TomatoClockView_Loaded(object sender, RoutedEventArgs e)
         {
             DisappearFromAltTab();
         }
@@ -78,7 +84,7 @@ namespace ToDoTomatoClock.Views
             notifyIcon = new NotifyIcon
             {
                 Icon = AppResource.TomatoClockIcon,
-                Text = "TomatoClock",
+                Text = "ToDoTomatoClock",
                 Visible = true
             };
             notifyIcon.MouseClick += NotifyIcon_MouseClick;

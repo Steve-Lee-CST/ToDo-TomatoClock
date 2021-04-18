@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:ToDoTomatoClock.Views"
         mc:Ignorable="d"
         Height="400" Width="320" 
+        x:Name="TodayToDoWindow"
         WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterScreen" Title="TodayToDoWindow" 
         MouseDown="Window_MouseDown"
@@ -62,8 +63,7 @@
         <Style x:Key="ListBoxStyle" TargetType="{x:Type ListBox}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="{Binding ButtonStaticForeground}"/>
-            <Setter Property="Foreground" Value="{Binding ButtonStaticForeground}"/>
+            <Setter Property="BorderBrush" Value="{Binding LabelForeground}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -73,11 +73,14 @@
             <Setter Property="ItemTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
+                                    Background="Transparent"
+                                    MouseLeave="StackPanel_MouseLeave">
                             <Grid Width="8" Background="Red" Margin="0,0,0,0"/>
                             <TextBlock Width="285" Margin="7,0,0,0"
                                        TextAlignment="Left"
-                                       FontSize="24"
+                                       Foreground="{Binding DataContext.LabelForeground, ElementName=TodayTaskLB}"
+                                       FontSize="26"
                                        Text="{Binding Subject}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding Command="{Binding DataContext.TodayTaskLBItemDBClickCmd, ElementName=TodayTaskLB}" 
@@ -344,7 +347,7 @@
                     Command="{Binding CloseCmd}"
                     Style="{StaticResource FuncBarButtonStyle}"/>
         </StackPanel>
-        <ListBox Height="375" 
+        <ListBox Height="370" Margin="0,0,5,0"
                  x:Name="TodayTaskLB"
                  ItemsSource="{Binding TodayTasks}"
                  DisplayMemberPath="Subject"

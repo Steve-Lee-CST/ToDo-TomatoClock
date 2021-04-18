@@ -82,6 +82,16 @@ namespace ToDoTomatoClock {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap FCListIcon {
+            get {
+                object obj = ResourceManager.GetObject("FCListIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap MinimizeIcon {
             get {
                 object obj = ResourceManager.GetObject("MinimizeIcon", resourceCulture);
@@ -122,6 +132,16 @@ namespace ToDoTomatoClock {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap PreIcon {
+            get {
+                object obj = ResourceManager.GetObject("PreIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap ResetIcon {
             get {
                 object obj = ResourceManager.GetObject("ResetIcon", resourceCulture);
@@ -142,9 +162,9 @@ namespace ToDoTomatoClock {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap TaskList {
+        internal static System.Drawing.Bitmap TaskListIcon {
             get {
-                object obj = ResourceManager.GetObject("TaskList", resourceCulture);
+                object obj = ResourceManager.GetObject("TaskListIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

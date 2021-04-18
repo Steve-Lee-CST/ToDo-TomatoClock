@@ -18,5 +18,6 @@ namespace ToDoTomatoClock.Services.Countdown
         public void Pause();
         public void Reset();
         public void Next();
+        public void Pre();
     }
 }

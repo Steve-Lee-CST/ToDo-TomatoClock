@@ -26,10 +26,10 @@ namespace ToDoTomatoClock.Views
         {
             InitializeComponent();
             RegisteMsg();
-            this.Loaded += MiniWindow_Loaded;
+            this.Loaded += TodayToDoView_Loaded;
         }
 
-        private void MiniWindow_Loaded(object sender, RoutedEventArgs e)
+        private void TodayToDoView_Loaded(object sender, RoutedEventArgs e)
         {
             DisappearFromAltTab();
         }
@@ -46,6 +46,8 @@ namespace ToDoTomatoClock.Views
                 this,
                 MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "ShowWindow"),
                 (r, m) => {
+                    if (!this.IsActive)
+                        this.Hide();
                     this.Show();
                 });
             WeakReferenceMessenger.Default.Register<object, string>(
@@ -71,6 +73,11 @@ namespace ToDoTomatoClock.Views
             SetWindowLong(helper, GWL_EX_STYLE, (GetWindowLong(helper, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
         }
         #endregion
+
+        private void StackPanel_MouseLeave(object sender, MouseEventArgs e)
+        {
+            TodayTaskLB.SelectedItem = null;
+        }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {

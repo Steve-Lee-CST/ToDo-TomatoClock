@@ -16,14 +16,9 @@ namespace ToDoTomatoClock.Services.Countdown
         void ICountdownService.Start()
         {
             if (-1 == infoPtr) return;
-            if(0 == currentInfo.TotalSecond)
-            {
-                infoPtr = (infoPtr + 1) % countdownInfos.Count;
-                CurrentInfo = countdownInfos[infoPtr];
-                TickEvent?.Invoke(CurrentInfo);
-            }
+            if (0 == currentInfo.TotalSecond) return;
 
-            if(DateTime.MinValue == currentInfo.StartTime)
+            if (DateTime.MinValue == currentInfo.StartTime)
             {
                 currentInfo.StartTime = DateTime.Now;
             }
@@ -41,6 +36,7 @@ namespace ToDoTomatoClock.Services.Countdown
         {
             if (-1 == infoPtr) return;
             base.Stop();
+
             CurrentInfo = countdownInfos[infoPtr];
             TickEvent?.Invoke(CurrentInfo);
         }
@@ -48,8 +44,8 @@ namespace ToDoTomatoClock.Services.Countdown
         void ICountdownService.Next()
         {
             if (-1 == infoPtr) return;
-
             base.Stop();
+
             if (DateTime.MinValue == currentInfo.FinishTime)
             {
                 currentInfo.FinishTime = DateTime.Now;
@@ -60,6 +56,25 @@ namespace ToDoTomatoClock.Services.Countdown
             ReachEndEvent?.Invoke(CurrentInfo);
 
             infoPtr = (infoPtr + 1) % countdownInfos.Count;
+            CurrentInfo = countdownInfos[infoPtr];
+            TickEvent?.Invoke(CurrentInfo);
+        }
+
+        void ICountdownService.Pre()
+        {
+            if (-1 == infoPtr) return;
+            base.Stop();
+
+            if (DateTime.MinValue == currentInfo.FinishTime)
+            {
+                currentInfo.FinishTime = DateTime.Now;
+            }
+            currentInfo.Minute = 0;
+            currentInfo.Second = 0;
+            TickEvent?.Invoke(CurrentInfo);
+            ReachEndEvent?.Invoke(CurrentInfo);
+
+            infoPtr = (infoPtr - 1 + countdownInfos.Count) % countdownInfos.Count;
             CurrentInfo = countdownInfos[infoPtr];
             TickEvent?.Invoke(CurrentInfo);
         }
