@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using ToDoTomatoClock.Config;
 using ToDoTomatoClock.Services.Countdown;
+using ToDoTomatoClock.Services.SimpleLog;
 using ToDoTomatoClock.Services.ThemeController;
 using ToDoTomatoClock.Services.ToDoDBMonitor;
 using ToDoTomatoClock.Views;
@@ -37,6 +38,7 @@ namespace ToDoTomatoClock
                 .AddSingleton<ICountdownService, CountdownService>()
                 .AddSingleton<ITomatoClockThemeService, TomatoClockThemeService>()
                 .AddSingleton<ITodayTaskMonitorService, TodayTaskMonitorService>()
+                .AddSingleton<ISimpleLogService, SimpleLogService>()
                 .AddSingleton<TodayToDoView>()
                 .BuildServiceProvider());
 

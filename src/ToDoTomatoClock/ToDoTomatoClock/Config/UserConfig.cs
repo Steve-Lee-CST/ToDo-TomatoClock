@@ -45,7 +45,7 @@ namespace ToDoTomatoClock.Config
 
         public static (bool, UserConfig) LoadUserConfig()
         {
-            string configPath = $"{Utils.GetCurrentPath()}config.json";
+            string configPath = $"{Utils.GetCurrentPath}config.json";
             UserConfig UConfig = null;
             if (!File.Exists(configPath))
             {

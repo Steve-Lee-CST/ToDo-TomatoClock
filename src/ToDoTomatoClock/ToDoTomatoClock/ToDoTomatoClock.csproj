@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MSToDoDB\MSToDoDB.csproj" />
+    <ProjectReference Include="..\SimpleLogDB\SimpleLogDB.csproj" />
   </ItemGroup>
 
   <ItemGroup>

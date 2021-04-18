@@ -1,4 +1,5 @@
-﻿using MSToDoDB;
+﻿using Microsoft.EntityFrameworkCore;
+using MSToDoDB;
 using MSToDoDB.Modules;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,13 @@ namespace ToDoTomatoClock.Services.ToDoDBMonitor
 
         protected void CheckChangeWithoutLock()
         {
+            foreach (var entity in Context.ChangeTracker.Entries().ToList())
+            {
+                entity.Reload();
+            }
+
             string nowDate = DateTime.Now.ToString("yyyy-MM-dd");
+
             List<Task> completedTask = Context.Tasks
                 .Where(x => x.CommittedDate == nowDate)
                 .Where(x => x.Status == "Completed")

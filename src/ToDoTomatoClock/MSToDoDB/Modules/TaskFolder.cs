@@ -9,8 +9,8 @@ using System.Text;
 namespace MSToDoDB.Modules
 {
     [Table("task_folders")]
-    public class TaskFolder {
-        
+    public class TaskFolder 
+    {
         [Column("_id")]
         public Int64 Id { get; set; }
         

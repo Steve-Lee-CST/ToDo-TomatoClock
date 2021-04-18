@@ -89,8 +89,8 @@ namespace ToDoTomatoClock.Services.Countdown
         private CountdownInfo currentInfo;
         public CountdownInfo CurrentInfo
         {
-            get => currentInfo?.Copy() ?? new CountdownInfo();
-            set => currentInfo = value?.Copy() ?? new CountdownInfo();
+            get => currentInfo?.Copy() ?? new CountdownInfo(0, 0);
+            set => currentInfo = value?.Copy() ?? new CountdownInfo(0, 0);
         }
 
         private int infoPtr;
@@ -121,11 +121,11 @@ namespace ToDoTomatoClock.Services.Countdown
             };
         }
 
-        public CountdownInfo ClockToCountdownInfo(Clock clock) => new CountdownInfo()
+        public CountdownInfo ClockToCountdownInfo(Clock clock)
         {
-            Minute = clock.Minute,
-            Second = clock.Second
-        };
+            int totalSecond = clock.Minute * 60 + clock.Second;
+            return new CountdownInfo(totalSecond, totalSecond);
+        }
 
         public void ResetCountdownInfo()
         {
@@ -133,7 +133,7 @@ namespace ToDoTomatoClock.Services.Countdown
                               select ClockToCountdownInfo(item)).ToList();
             if (0 == countdownInfos.Count)
             {
-                CurrentInfo = new CountdownInfo();
+                CurrentInfo = new CountdownInfo(0, 0);
                 infoPtr = -1;
             }
             else

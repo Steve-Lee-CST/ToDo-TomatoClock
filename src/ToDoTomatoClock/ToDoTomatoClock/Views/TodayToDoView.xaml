@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ToDoTomatoClock.Views"
+        xmlns:vm="clr-namespace:ToDoTomatoClock.ViewModels"
+        xmlns:vc ="clr-namespace:ToDoTomatoClock.Views.ValueConverters"
         mc:Ignorable="d"
         Height="400" Width="320" 
         x:Name="TodayToDoWindow"
@@ -12,9 +14,10 @@
         MouseDown="Window_MouseDown"
         Background="{Binding GlobalBackground}" Topmost="{Binding TopMost}">
     <Window.DataContext>
-        <vm:TodayToDoViewModel xmlns:vm="clr-namespace:ToDoTomatoClock.ViewModels" x:Name="VM"/>
+        <vm:TodayToDoViewModel x:Name="VM"/>
     </Window.DataContext>
     <Window.Resources>
+        <vc:TaskStatusToSolidColorBrush x:Key="TaskStatusConverter"/>
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">
                 <Setter.Value>
@@ -76,7 +79,7 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
                                     Background="Transparent"
                                     MouseLeave="StackPanel_MouseLeave">
-                            <Grid Width="8" Background="Red" Margin="0,0,0,0"/>
+                            <Grid Width="8" Background="{Binding Status, Converter={StaticResource TaskStatusConverter}}" Margin="0,0,0,0"/>
                             <TextBlock Width="285" Margin="7,0,0,0"
                                        TextAlignment="Left"
                                        Foreground="{Binding DataContext.LabelForeground, ElementName=TodayTaskLB}"

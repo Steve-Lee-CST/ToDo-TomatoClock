@@ -19,19 +19,15 @@ namespace ToDoTomatoClock.Tools
         /// <param name="path">指定路径</param>
         /// <param name="fileName">文件名</param>
         /// <returns>包括全部符合条件的文件全路径的集合</returns>
-        public static List<string> SearchFileInPath(string path, string fileName)
-        {
-            return new List<string>(Directory.GetFiles(path, fileName, SearchOption.AllDirectories));
-        }
+        public static List<string> SearchFileInPath(string path, string fileName) =>
+            new List<string>(Directory.GetFiles(path, fileName, SearchOption.AllDirectories));
 
         /// <summary>
         /// 获取当前 exe 文件所在目录
         /// </summary>
         /// <returns>文件所在目录的全路径</returns>
-        public static string GetCurrentPath()
-        {
-            return System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-        }
+        public static string GetCurrentPath => 
+            System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
 
         public static void PlaySound(string wavFullPath)
         {

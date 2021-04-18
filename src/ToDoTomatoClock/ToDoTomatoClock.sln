@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSToDoDB", "MSToDoDB\MSToDoDB.csproj", "{73E1C05F-4B12-4E3F-9648-7250161C7E99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoTomatoClock", "ToDoTomatoClock\ToDoTomatoClock.csproj", "{A071C90D-16CA-4B02-802E-20EDD69B0E6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDoTomatoClock", "ToDoTomatoClock\ToDoTomatoClock.csproj", "{A071C90D-16CA-4B02-802E-20EDD69B0E6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleLogDB", "SimpleLogDB\SimpleLogDB.csproj", "{826BB007-AE62-4C99-A93F-FDC07BAEC30C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A071C90D-16CA-4B02-802E-20EDD69B0E6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A071C90D-16CA-4B02-802E-20EDD69B0E6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A071C90D-16CA-4B02-802E-20EDD69B0E6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{826BB007-AE62-4C99-A93F-FDC07BAEC30C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{826BB007-AE62-4C99-A93F-FDC07BAEC30C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{826BB007-AE62-4C99-A93F-FDC07BAEC30C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{826BB007-AE62-4C99-A93F-FDC07BAEC30C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
