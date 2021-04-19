@@ -2,11 +2,11 @@
 > A plugin about Tomato-Clock for Microsoft-To-Do
 
 ## Development Plan:
-- [ ] **Config file IO** 
+- [x] **Config file IO** 
 - [x] **Microsoft To Do: data-reader & data-monitor**
-- [ ] **UI Design**
-- [ ] **Tomato Clock**
-- [ ] **Interrupt-function**
+- [x] **UI Design**
+- [x] **Tomato Clock**
+- [x] **Interrupt-function**
 - [ ] **Review-function**
 - [ ] **Settings**
 
