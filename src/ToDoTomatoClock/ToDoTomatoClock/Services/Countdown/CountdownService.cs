@@ -8,28 +8,61 @@ using System.Threading;
 
 namespace ToDoTomatoClock.Services.Countdown
 {
+    // 有空改成 有限状态机
+    // 倒计时服务
     public class CountdownService : DispatcherTimer, ICountdownService
     {
         public event ICountdownService.TickDelegate TickEvent;
         public event ICountdownService.ReachEndDelegate ReachEndEvent;
+        public event ICountdownService.InterruptDelegate RecoverFromInterruptEvent;
 
         void ICountdownService.Start()
         {
             if (-1 == infoPtr) return;
-            if (0 == currentInfo.TotalSecond) return;
 
-            if (DateTime.MinValue == currentInfo.StartTime)
+            switch (currentInfo.Status)
             {
-                currentInfo.StartTime = DateTime.Now;
+                case CountdownInfoStatus.NotStart:
+                    currentInfo.Status = CountdownInfoStatus.Running;
+                    currentInfo.StartTime = DateTime.Now;
+                    base.Start();
+                    return;
+                case CountdownInfoStatus.Running:
+                    return;
+                case CountdownInfoStatus.Paused:
+                    RecoverFromInterruptEvent.Invoke();
+                    return;
+                case CountdownInfoStatus.Completed:
+                    return;
+                default:
+                    return;
             }
-
-            base.Start();
         }
 
         void ICountdownService.Pause()
         {
             if (-1 == infoPtr) return;
-            base.Stop();
+
+            switch (currentInfo.Status)
+            {
+                case CountdownInfoStatus.NotStart:
+                    return;
+                case CountdownInfoStatus.Running:
+                    base.Stop();
+                    currentInfo.InterruptionInfos.Add(new InterruptionInfo()
+                    {
+                        StartTime = DateTime.Now
+                    });
+                    currentInfo.Status = CountdownInfoStatus.Paused;
+                    return;
+                case CountdownInfoStatus.Paused:
+                    return;
+                case CountdownInfoStatus.Completed:
+                    return;
+                default:
+                    return;
+            }
+            
         }
 
         void ICountdownService.Reset()
@@ -44,39 +77,113 @@ namespace ToDoTomatoClock.Services.Countdown
         void ICountdownService.Next()
         {
             if (-1 == infoPtr) return;
-            base.Stop();
 
-            if (DateTime.MinValue == currentInfo.FinishTime)
+            switch (currentInfo.Status)
             {
-                currentInfo.FinishTime = DateTime.Now;
-            }
-            currentInfo.Minute = 0;
-            currentInfo.Second = 0;
-            TickEvent?.Invoke(CurrentInfo);
-            ReachEndEvent?.Invoke(CurrentInfo);
+                case CountdownInfoStatus.NotStart:
+                    infoPtr = (infoPtr + countdownInfos.Count + 1) % countdownInfos.Count;
+                    CurrentInfo = countdownInfos[infoPtr];
 
-            infoPtr = (infoPtr + 1) % countdownInfos.Count;
-            CurrentInfo = countdownInfos[infoPtr];
-            TickEvent?.Invoke(CurrentInfo);
+                    TickEvent?.Invoke(CurrentInfo);
+                    return;
+                case CountdownInfoStatus.Running:
+                    base.Stop();
+                    currentInfo.Minute = 0;
+                    currentInfo.Second = 0;
+                    currentInfo.FinishTime = DateTime.Now;
+                    currentInfo.Status = CountdownInfoStatus.Completed;
+
+                    TickEvent?.Invoke(CurrentInfo);
+                    ReachEndEvent?.Invoke(CurrentInfo);
+                    return;
+                case CountdownInfoStatus.Paused:
+                    base.Stop();
+                    currentInfo.Minute = 0;
+                    currentInfo.Second = 0;
+                    currentInfo.FinishTime = DateTime.Now;
+                    currentInfo.InterruptionInfos.Last().FinishTime = DateTime.Now;
+                    currentInfo.Status = CountdownInfoStatus.Completed;
+
+                    TickEvent?.Invoke(CurrentInfo);
+                    ReachEndEvent?.Invoke(CurrentInfo);
+                    return;
+                case CountdownInfoStatus.Completed:
+                    infoPtr = (infoPtr + countdownInfos.Count + 1) % countdownInfos.Count;
+                    CurrentInfo = countdownInfos[infoPtr];
+
+                    TickEvent?.Invoke(CurrentInfo);
+                    return;
+                default:
+                    return;
+            }
         }
 
         void ICountdownService.Pre()
         {
             if (-1 == infoPtr) return;
-            base.Stop();
 
-            if (DateTime.MinValue == currentInfo.FinishTime)
+            switch (currentInfo.Status)
             {
-                currentInfo.FinishTime = DateTime.Now;
-            }
-            currentInfo.Minute = 0;
-            currentInfo.Second = 0;
-            TickEvent?.Invoke(CurrentInfo);
-            ReachEndEvent?.Invoke(CurrentInfo);
+                case CountdownInfoStatus.NotStart:
+                    infoPtr = (infoPtr + countdownInfos.Count - 1) % countdownInfos.Count;
+                    CurrentInfo = countdownInfos[infoPtr];
 
-            infoPtr = (infoPtr - 1 + countdownInfos.Count) % countdownInfos.Count;
-            CurrentInfo = countdownInfos[infoPtr];
-            TickEvent?.Invoke(CurrentInfo);
+                    TickEvent?.Invoke(CurrentInfo);
+                    return;
+                case CountdownInfoStatus.Running:
+                    base.Stop();
+                    currentInfo.Minute = 0;
+                    currentInfo.Second = 0;
+                    currentInfo.FinishTime = DateTime.Now;
+                    currentInfo.Status = CountdownInfoStatus.Completed;
+
+                    TickEvent?.Invoke(CurrentInfo);
+                    ReachEndEvent?.Invoke(CurrentInfo);
+                    return;
+                case CountdownInfoStatus.Paused:
+                    base.Stop();
+                    currentInfo.Minute = 0;
+                    currentInfo.Second = 0;
+                    currentInfo.FinishTime = DateTime.Now;
+                    currentInfo.InterruptionInfos.Last().FinishTime = DateTime.Now;
+                    currentInfo.Status = CountdownInfoStatus.Completed;
+
+                    TickEvent?.Invoke(CurrentInfo);
+                    ReachEndEvent?.Invoke(CurrentInfo);
+                    return;
+                case CountdownInfoStatus.Completed:
+                    infoPtr = (infoPtr + countdownInfos.Count - 1) % countdownInfos.Count;
+                    CurrentInfo = countdownInfos[infoPtr];
+
+                    TickEvent?.Invoke(CurrentInfo);
+                    return;
+                default:
+                    return;
+            }
+        }
+
+        CountdownInfo ICountdownService.SetCountdownRemark(string remark)
+        {
+            currentInfo.Remark = remark;
+            return CurrentInfo;
+        }
+
+        CountdownInfo ICountdownService.SetInterruptionRemark(string remark)
+        {
+            currentInfo.InterruptionInfos.Last().Remark = remark;
+            currentInfo.InterruptionInfos.Last().FinishTime = DateTime.Now;
+
+            base.Start();
+            currentInfo.Status = CountdownInfoStatus.Running;
+
+            return CurrentInfo;
+        }
+
+        private CountdownInfo currentInfo;
+        public CountdownInfo CurrentInfo
+        {
+            get => currentInfo?.Copy() ?? new CountdownInfo();
+            set => currentInfo = value?.Copy() ?? new CountdownInfo();
         }
 
         private List<CountdownInfo> countdownInfos;
@@ -84,13 +191,6 @@ namespace ToDoTomatoClock.Services.Countdown
         {
             get { return countdownInfos; }
             set { countdownInfos = value ?? new List<CountdownInfo>(); }
-        }
-        
-        private CountdownInfo currentInfo;
-        public CountdownInfo CurrentInfo
-        {
-            get => currentInfo?.Copy() ?? new CountdownInfo(0, 0);
-            set => currentInfo = value?.Copy() ?? new CountdownInfo(0, 0);
         }
 
         private int infoPtr;
@@ -108,9 +208,11 @@ namespace ToDoTomatoClock.Services.Countdown
             Tick += (s, e) =>
             {
                 currentInfo.Tick();
-                if (currentInfo.ReachEnd)
+                if (currentInfo.TotalSecond <= 0)
                 {
-                    Stop();
+                    base.Stop();
+                    currentInfo.FinishTime = DateTime.Now;
+                    currentInfo.Status = CountdownInfoStatus.Completed;
                     TickEvent?.Invoke(CurrentInfo);
                     ReachEndEvent?.Invoke(CurrentInfo);
                 }
@@ -124,7 +226,11 @@ namespace ToDoTomatoClock.Services.Countdown
         public CountdownInfo ClockToCountdownInfo(Clock clock)
         {
             int totalSecond = clock.Minute * 60 + clock.Second;
-            return new CountdownInfo(totalSecond, totalSecond);
+            return new CountdownInfo() 
+            {
+                TotalSecond = totalSecond,
+                TotalSecondRecord = totalSecond
+            };
         }
 
         public void ResetCountdownInfo()
@@ -133,7 +239,7 @@ namespace ToDoTomatoClock.Services.Countdown
                               select ClockToCountdownInfo(item)).ToList();
             if (0 == countdownInfos.Count)
             {
-                CurrentInfo = new CountdownInfo(0, 0);
+                CurrentInfo = new CountdownInfo();
                 infoPtr = -1;
             }
             else
@@ -141,6 +247,7 @@ namespace ToDoTomatoClock.Services.Countdown
                 CurrentInfo = countdownInfos[0];
                 infoPtr = 0;
             }
+
         }
     }
 }

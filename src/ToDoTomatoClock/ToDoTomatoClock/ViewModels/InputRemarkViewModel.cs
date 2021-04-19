@@ -2,26 +2,23 @@
 using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
-using MSToDoDB.Modules;
-using SimpleLogDB.Modules;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
+using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
 using ToDoTomatoClock.Config;
 using ToDoTomatoClock.Models;
-using ToDoTomatoClock.Services.SimpleLog;
 using ToDoTomatoClock.Services.ThemeController;
-using ToDoTomatoClock.Services.ToDoDBMonitor;
 using ToDoTomatoClock.Tools;
 using ToDoTomatoClock.Views;
 
 namespace ToDoTomatoClock.ViewModels
 {
-    public class TodayToDoViewModel : ObservableObject
+    public class InputRemarkViewModel : ObservableObject
     {
-        public TodayToDoViewModel()
+        public InputRemarkViewModel()
         {
             InitBinding();
         }
@@ -29,29 +26,11 @@ namespace ToDoTomatoClock.ViewModels
         private void InitBinding()
         {
             InitBindingWindow();
-
             InitBindingCloseBtn();
-            InitBindingTopMostBtn();
-            InitBindingTodayTaskLB();
-
-            WeakReferenceMessenger.Default.Register<object, string>(
-                this,
-                MsgToken.Create(nameof(TomatoClockViewModel), nameof(TodayToDoViewModel), "ShowTodayToDoWindow"),
-                (r, m) =>
-                {
-                    ApplyTheme(Ioc.Default.GetService<ITomatoClockThemeService>().CurrentTheme);
-                    WeakReferenceMessenger.Default.Send(
-                        new object(),
-                        MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "ShowWindow"));
-                });
-            WeakReferenceMessenger.Default.Register<object, string>(
-                this,
-                MsgToken.Global("Close"),
-                (r, m) => {
-                    WeakReferenceMessenger.Default.Send(
-                        new object(),
-                        MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "CloseWindow"));
-                });
+            InitBindingTitle();
+            InitBindingRemark();
+            InitBindingCancelBtn();
+            InitBindingOKBtn();
         }
 
         #region Binding TomatoClockTheme
@@ -131,22 +110,18 @@ namespace ToDoTomatoClock.ViewModels
         {
             GlobalBackground = new SolidColorBrush(
                 (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(theme.GlobalBackground));
-            ButtonStaticForeground = new SolidColorBrush(ColorStrToColor(theme.Button.StaticForeground));
+            ButtonStaticForeground = new SolidColorBrush(ColorStrToColor(theme.Label.Foreground));
             ButtonMouseOverForeground = new SolidColorBrush(ColorStrToColor(theme.Button.MouseOverForeground));
             ButtonPressedForeground = new SolidColorBrush(ColorStrToColor(theme.Button.PressedForeground));
             ButtonStaticOpacity = ColorStrToColor(theme.Button.StaticForeground).A / 255.0;
             ButtonMouseOverOpacity = ColorStrToColor(theme.Button.MouseOverForeground).A / 255.0;
             ButtonPressedOpacity = ColorStrToColor(theme.Button.PressedForeground).A / 255.0;
             CloseIcon = GetBitmapBaseOnTheme(AppResource.CloseIcon);
-            TopMostIcon = GetBitmapBaseOnTheme(AppResource.UnpinIcon);
             LabelFontFamily = new System.Windows.Media.FontFamily(theme.Label.FontFamily);
             LabelFontSize = theme.Label.FontSize;
-            LabelForeground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(
-                ColorStrToColor(theme.Label.Foreground).R,
-                ColorStrToColor(theme.Label.Foreground).G,
-                ColorStrToColor(theme.Label.Foreground).B));
+            LabelForeground = new SolidColorBrush(ColorStrToColor(theme.Label.Foreground));
         }
-        
+
 
         private System.Windows.Media.Color ColorStrToColor(string colorStr) =>
             (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorStr);
@@ -161,23 +136,28 @@ namespace ToDoTomatoClock.ViewModels
             set => SetProperty(ref globalBackGround, value);
         }
 
-        // 是否显示在最前
-        private bool topMost;
-        public bool TopMost
+        private void InitBindingWindow() 
         {
-            get => topMost;
-            set => SetProperty(ref topMost, value);
+            WeakReferenceMessenger.Default.Register<string, string>(
+                this,
+                MsgToken.Create(nameof(TomatoClockViewModel), nameof(InputRemarkViewModel), "ShowInputRemarkWindow"),
+                (r, m) =>
+                {
+                    ApplyTheme(Ioc.Default.GetService<ITomatoClockThemeService>().CurrentTheme);
+                    Title = m;
+                    WeakReferenceMessenger.Default.Send(
+                        new object(),
+                        MsgToken.Create(nameof(InputRemarkViewModel), nameof(InputRemarkView), "ShowWindow"));
+                });
+            WeakReferenceMessenger.Default.Register<object, string>(
+                this,
+                MsgToken.Global("Close"),
+                (r, m) => {
+                    WeakReferenceMessenger.Default.Send(
+                        new object(),
+                        MsgToken.Create(nameof(InputRemarkViewModel), nameof(InputRemarkView), "CloseWindow"));
+                });
         }
-
-        private string title;
-
-        public string Title
-        {
-            get => title;
-            set => SetProperty(ref title, value);
-        }
-
-        private void InitBindingWindow() { }
         #endregion
 
         #region Binding CloseBtn
@@ -198,89 +178,70 @@ namespace ToDoTomatoClock.ViewModels
             {
                 WeakReferenceMessenger.Default.Send<object, string>(
                     new object(),
-                    MsgToken.Create(nameof(TodayToDoViewModel), nameof(TodayToDoView), "HideWindow"));
+                    MsgToken.Create(nameof(InputRemarkViewModel), nameof(InputRemarkView), "HideWindow"));
             });
         }
         #endregion
 
-        #region Binding TopMostBtn
-        // 是否置顶的图标
-        private ImageBrush topMostIcon;
-        public ImageBrush TopMostIcon
+        #region Binding Title
+        private string title;
+        public string Title
         {
-            get => topMostIcon;
-            set => SetProperty(ref topMostIcon, value);
+            get => title;
+            set => SetProperty(ref title, value);
         }
 
-        // 置顶按钮单击的绑定事件
-        public ICommand TopMostCmd { get; set; }
+        private void InitBindingTitle() { }
+        #endregion
 
-        private void InitBindingTopMostBtn()
+        #region Binding Remark
+        private string remark;
+        public string Remark
         {
-            // TopMostIcon = GetBitmapBaseOnTheme(AppResource.UnpinIcon);
-            TopMostCmd = new RelayCommand(() =>
-            {
-                TopMost = !TopMost;
-                TopMostIcon = TopMost ? GetBitmapBaseOnTheme(AppResource.PinIcon) : GetBitmapBaseOnTheme(AppResource.UnpinIcon);
-            });
+            get => remark;
+            set => SetProperty(ref remark, value);
+        }
+
+        private void InitBindingRemark()
+        {
+
         }
         #endregion
 
-        #region Binding TodayTaskLB
-        private List<Task> todayTasks;
-
-        public List<Task> TodayTasks
+        #region Binding CancelBtn
+        public ICommand CancelCmd { get; set; }
+        
+        private void InitBindingCancelBtn()
         {
-            get => todayTasks;
-            set => SetProperty(ref todayTasks, value);
-        }
-
-        private Task selectedTask;
-
-        public Task SelectedTask
-        {
-            get => selectedTask;
-            set
-            {
-                SetProperty(ref selectedTask, value);
-            }
-        }
-
-        public ICommand TodayTaskLBItemDBClickCmd { get; set; }
-        public ICommand TodayTaskLBItemLostFocus { get; set; }
-
-        private void InitBindingTodayTaskLB()
-        {
-            TodayTaskLBItemDBClickCmd = new RelayCommand<object>((_) =>
+            CancelCmd = new RelayCommand(() =>
             {
                 WeakReferenceMessenger.Default.Send(
-                    SelectedTask,
-                    MsgToken.Create(nameof(TodayToDoViewModel), nameof(TomatoClockViewModel), "selectedTask"));
-                SelectedTask = null;
+                    string.Empty,
+                    MsgToken.Create(nameof(InputRemarkViewModel), nameof(TomatoClockViewModel), string.Format("{0}\\{1}", Title, "Remark")));
+                Title = string.Empty;
+                Remark = string.Empty;
+                WeakReferenceMessenger.Default.Send(
+                    new object(),
+                    MsgToken.Create(nameof(InputRemarkViewModel), nameof(InputRemarkView), "HideWindow"));
             });
+        }
+        #endregion
 
-            TodayTaskLBItemLostFocus = new RelayCommand(() =>
+        #region Binding OKBtn
+        public ICommand OKCmd { get; set; }
+        private void InitBindingOKBtn()
+        {
+            OKCmd = new RelayCommand(() =>
             {
-                SelectedTask = null;
+                WeakReferenceMessenger.Default.Send(
+                    Remark,
+                    MsgToken.Create(nameof(InputRemarkViewModel), nameof(TomatoClockViewModel), string.Format("{0}\\{1}", Title, "Remark")));
+                Title = string.Empty;
+                Remark = string.Empty;
+                WeakReferenceMessenger.Default.Send(
+                    new object(),
+                    MsgToken.Create(nameof(InputRemarkViewModel), nameof(InputRemarkView), "HideWindow"));
             });
-
-            // 注册消息响应函数刷新 今日待办 的列表
-            Ioc.Default.GetService<ITodayTaskMonitorService>().DataChangeEvent += (d) =>
-            {
-                TodayTasks = d;
-                var s = Ioc.Default.GetService<ISimpleLogService>();
-                var q = s.Context.SimpleTasks;
-
-                foreach (Task task in d)
-                {
-                    if(0 == q.Where(x=>x.OnlineId == task.OnlineId).ToList().Count)
-                    {
-                        q.Add(s.ConvertFromTask(task));
-                    }
-                }
-
-                s.Context.SaveChanges();
-            };
         }
         #endregion
 
@@ -293,13 +254,6 @@ namespace ToDoTomatoClock.ViewModels
                         ButtonStaticForeground.Color.R,
                         ButtonStaticForeground.Color.G,
                         ButtonStaticForeground.Color.B)));
-
-        private string CountdownInfoToStr(CountdownInfo info)
-        {
-            return $"" +
-                    $"{info.Minute.ToString().PadLeft(2, '0')}:" +
-                    $"{info.Second.ToString().PadLeft(2, '0')}";
-        }
 
         #endregion
     }

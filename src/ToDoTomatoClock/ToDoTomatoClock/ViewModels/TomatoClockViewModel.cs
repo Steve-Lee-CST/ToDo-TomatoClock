@@ -3,12 +3,15 @@ using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using MSToDoDB.Modules;
+using SimpleLogDB.Modules;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
 using ToDoTomatoClock.Config;
 using ToDoTomatoClock.Models;
 using ToDoTomatoClock.Services.Countdown;
+using ToDoTomatoClock.Services.SimpleLog;
 using ToDoTomatoClock.Services.ThemeController;
 using ToDoTomatoClock.Tools;
 using ToDoTomatoClock.Views;
@@ -177,25 +180,8 @@ namespace ToDoTomatoClock.ViewModels
             set => SetProperty(ref title, value);
         }
 
-        private Task selectedTask;
-
-        public Task SelectedTask
-        {
-            get => selectedTask;
-            set => SetProperty(ref selectedTask, value);
-        }
-
-
         private void InitBindingWindow() 
         {
-            WeakReferenceMessenger.Default.Register<Task, string>(
-                this,
-                MsgToken.Create(nameof(TodayToDoViewModel), nameof(TomatoClockViewModel), "selectedTask"),
-                (r, m) =>
-                {
-                    SelectedTask = m;
-                    Title = m.Subject;
-                });
         }
         #endregion
 
@@ -417,7 +403,7 @@ namespace ToDoTomatoClock.ViewModels
 
             FCListCmd = new RelayCommand(() =>
             {
-
+                // show finished-clock list view
             });
         }
 
@@ -433,6 +419,14 @@ namespace ToDoTomatoClock.ViewModels
 
         public ICommand TaskListCmd { get; set; }
 
+        private Task selectedTask;
+
+        public Task SelectedTask
+        {
+            get => selectedTask;
+            set => SetProperty(ref selectedTask, value);
+        }
+
         private void InitBindingTaskListBtn()
         {
             // TaskListIcon = GetBitmapBaseOnTheme(AppResource.TaskListIcon);
@@ -442,6 +436,16 @@ namespace ToDoTomatoClock.ViewModels
                     new object(),
                     MsgToken.Create(nameof(TomatoClockViewModel), nameof(TodayToDoViewModel), "ShowTodayToDoWindow"));
             });
+
+            // 今日任务选择的结果
+            WeakReferenceMessenger.Default.Register<Task, string>(
+                this,
+                MsgToken.Create(nameof(TodayToDoViewModel), nameof(TomatoClockViewModel), "selectedTask"),
+                (r, m) =>
+                {
+                    SelectedTask = m;
+                    Title = m.Subject;
+                });
         }
         #endregion
 
@@ -456,15 +460,78 @@ namespace ToDoTomatoClock.ViewModels
 
         private void InitBindingCountdownStr()
         {
+            string countdownRemark = "Countdown Remark";
+            string interruptionRemark = "Interruption Remark";
+
             CountdownStr = CountdownInfoToStr(Ioc.Default.GetService<ICountdownService>().CurrentInfo);
+
+            // 倒计时，每一秒触发一次
             Ioc.Default.GetService<ICountdownService>().TickEvent += (t) =>
             {
                 CountdownStr = CountdownInfoToStr(t);
             };
+
+            // 倒计时结束触发
             Ioc.Default.GetService<ICountdownService>().ReachEndEvent += (t) =>
             {
+                // 播放音乐，显示remark输入窗体，输入此次 倒计时 的remark
                 Utils.PlaySound(App.UConfig.AlarmFile);
+                WeakReferenceMessenger.Default.Send(
+                    countdownRemark,
+                    MsgToken.Create(nameof(TomatoClockViewModel), nameof(InputRemarkViewModel), "ShowInputRemarkWindow"));
             };
+
+            // 倒计时被中断后恢复时触发
+            Ioc.Default.GetService<ICountdownService>().RecoverFromInterruptEvent += () =>
+            {
+                // 显示remark输入窗体，输入此次 中断 的remark
+                WeakReferenceMessenger.Default.Send(
+                    interruptionRemark,
+                    MsgToken.Create(nameof(TomatoClockViewModel), nameof(InputRemarkViewModel), "ShowInputRemarkWindow"));
+            };
+
+            // 注册消息响应函数接收 remark输入窗体 输入的倒计时remark信息
+            WeakReferenceMessenger.Default.Register<string, string>(
+                this,
+                MsgToken.Create(nameof(InputRemarkViewModel), nameof(TomatoClockViewModel), string.Format("{0}\\{1}", countdownRemark, "Remark")),
+                (r, m) =>
+                {
+                    CountdownInfo info = Ioc.Default.GetService<ICountdownService>().SetCountdownRemark(m);
+                    // 写入数据库
+                    ISimpleLogService service = Ioc.Default.GetService<ISimpleLogService>();
+                    service.Context.TomatoClockLogs.Add(new TomatoClockLog()
+                    {
+                        StartTime = info.StartTime,
+                        EndTime = info.FinishTime,
+                        TotalSecond = info.TotalSecondRecord,
+                        Remark = info.Remark,
+                        SimpleTask = service.ConvertFromTask(SelectedTask ?? new Task())
+                    });
+
+                    service.Context.SaveChanges();
+                    TomatoClockLog tcLog = service.Context.TomatoClockLogs.ToList().Last();
+                    foreach(InterruptionInfo item in info.InterruptionInfos)
+                    {
+                        service.Context.InterruptionLogs.Add(new InterruptionLog()
+                        {
+                            StartTime = item.StartTime,
+                            EndTime = item.FinishTime,
+                            Remark = item.Remark,
+                            TomatoClockLog = tcLog
+                        });
+                    }
+
+                    service.Context.SaveChanges();
+                });
+
+            // 注册消息响应函数接收 remark输入窗体 输入的中断remark信息
+            WeakReferenceMessenger.Default.Register<string, string>(
+                this,
+                MsgToken.Create(nameof(InputRemarkViewModel), nameof(TomatoClockViewModel), string.Format("{0}\\{1}", interruptionRemark, "Remark")),
+                (r, m) =>
+                {
+                    var a = Ioc.Default.GetService<ICountdownService>().SetInterruptionRemark(m);
+                });
         }
         #endregion
 

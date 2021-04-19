@@ -6,10 +6,8 @@ namespace ToDoTomatoClock.Models
 {
     public class CountdownInfo
     {
-        public int TotalSecond { get; protected set; } = 0;
-        public int TotalSecondRecord { get; protected set; } = 0;
-
-        public bool ReachEnd => TotalSecond <= 0;
+        public int TotalSecond { get; set; } = 0;
+        
         public int Minute
         {
             get => TotalSecond / 60;
@@ -21,17 +19,41 @@ namespace ToDoTomatoClock.Models
             set => TotalSecond = Minute * 60 + value;
         }
 
-        public DateTime StartTime { get; set; } = DateTime.MinValue;
-        public DateTime FinishTime { get; set; } = DateTime.MinValue;
-
-        public void Tick() => TotalSecond--;
-
-        public CountdownInfo(int totalSecond, int totalSecondRecord)
+        public CountdownInfoStatus Status { get; set; } = CountdownInfoStatus.NotStart;
+        public void Tick()
         {
-            TotalSecond = totalSecond;
-            TotalSecondRecord = totalSecondRecord;
+            TotalSecond--;
+            if (TotalSecond <= 0)
+            {
+                TotalSecond = 0;
+            }
         }
 
-        public CountdownInfo Copy() => new CountdownInfo(TotalSecond, TotalSecondRecord);
+        public CountdownInfo Copy() => new CountdownInfo() 
+        {
+            TotalSecond = this.TotalSecond,
+            Status = this.Status,
+
+            TotalSecondRecord = this.TotalSecondRecord,
+            StartTime = this.StartTime,
+            FinishTime = this.FinishTime,
+            InterruptionInfos = new List<InterruptionInfo>(this.InterruptionInfos),
+            Remark = this.Remark
+        };
+
+        public int TotalSecondRecord { get; set; } = 0;
+        public DateTime StartTime { get; set; } = DateTime.MinValue;
+        public DateTime FinishTime { get; set; } = DateTime.MinValue;
+        public List<InterruptionInfo> InterruptionInfos { get; set; } = new List<InterruptionInfo>();
+        public string Remark { get; set; } = string.Empty;
+    }
+
+    public enum CountdownInfoStatus
+    {
+        NotStart = 0,
+        Running = 1,
+        Paused = 2,
+        Completed = 3,
+        Default = 0,
     }
 }

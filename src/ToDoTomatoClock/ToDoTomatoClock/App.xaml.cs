@@ -40,9 +40,11 @@ namespace ToDoTomatoClock
                 .AddSingleton<ITodayTaskMonitorService, TodayTaskMonitorService>()
                 .AddSingleton<ISimpleLogService, SimpleLogService>()
                 .AddSingleton<TodayToDoView>()
+                .AddSingleton<InputRemarkView>()
                 .BuildServiceProvider());
 
             Ioc.Default.GetService<TodayToDoView>();
+            Ioc.Default.GetService<InputRemarkView>();
         }
 
        

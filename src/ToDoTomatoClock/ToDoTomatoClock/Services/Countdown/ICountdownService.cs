@@ -13,11 +13,18 @@ namespace ToDoTomatoClock.Services.Countdown
         public delegate void ReachEndDelegate(CountdownInfo info);
         public event ReachEndDelegate ReachEndEvent;
 
-        public CountdownInfo CurrentInfo { get; }
+        public delegate void InterruptDelegate();
+        public event InterruptDelegate RecoverFromInterruptEvent;
+
         public void Start();
         public void Pause();
         public void Reset();
         public void Next();
         public void Pre();
+
+        public CountdownInfo SetCountdownRemark(string remark);
+        public CountdownInfo SetInterruptionRemark(string remark);
+
+        public CountdownInfo CurrentInfo { get; }
     }
 }

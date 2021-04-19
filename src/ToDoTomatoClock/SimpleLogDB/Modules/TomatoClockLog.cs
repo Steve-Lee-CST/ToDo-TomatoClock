@@ -12,13 +12,13 @@ namespace SimpleLogDB.Modules
         public Int64 Id { get; set; }
 
         [Column("start_time")]
-        public String StartTime { get; set; }
+        public DateTime StartTime { get; set; }
 
         [Column("end_time")]
-        public String EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         [Column("total_second")]
-        public String TotalSecond { get; set; }
+        public Int64 TotalSecond { get; set; }
 
         [Column("remark")]
         public String Remark { get; set; }
